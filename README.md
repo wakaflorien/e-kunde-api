@@ -1,98 +1,237 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# e-Kunde API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## A new way to care for your mind and community
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+![Mental Health East Africa](https://img.shields.io/badge/Mental%20Health-East%20Africa-green.svg)
+![Version](https://img.shields.io/badge/version-0.0.1-blue.svg)
+![Built with NestJS](https://img.shields.io/badge/built%20with-NestJS-ea2845.svg)
+![License](https://img.shields.io/badge/license-UNLICENSED-red.svg)
 
-## Description
+## A safe digital space to care, connect, and grow — powered by AI, guided by compassion\*
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Mental health in East Africa faces unique challenges—from stigma to access. **e-Kunde** was born from a need for a space that understands. We're not just an app; we're a **digital hearth for healing, connection, and growth**, built on shared experiences and cultural understanding.
 
-## Project setup
+We bridge technology with empathy, offering inclusive tools for students, clinics, universities, and NGOs. Our mission is to make mental wellness a tangible, daily practice for everyone.
+
+## ✨ What Makes e-Kunde Different
+
+- **🏠 Cultural Understanding**: Built specifically for East African communities and contexts
+- **🤝 Community-Centered**: Fostering connections within and between communities
+- **🎓 Multi-Institutional**: Supporting students, clinics, universities, and NGOs
+- **🧠 AI + Empathy**: Technology that amplifies human compassion rather than replacing it
+- **🛡️ Stigma-Free Zone**: Creating safe spaces where mental health conversations can flourish
+- **📱 Accessible**: Making mental wellness tools available where they're needed most
+
+## 🚀 Core Features
+
+### For Individuals
+
+- **🧘 Wellness Tracking**: Daily mental health check-ins and mood monitoring
+- **📚 Educational Resources**: Culturally relevant mental health information and coping strategies
+- **🤖 AI Companion**: Compassionate AI assistant trained on mental health best practices
+- **🔒 Privacy First**: End-to-end encryption and anonymous options for sensitive conversations
+
+### For Communities
+
+- **👥 Peer Support Groups**: Moderated community spaces for shared experiences
+- **🎯 Crisis Intervention**: 24/7 support pathways and emergency resource connections
+- **📊 Community Insights**: Anonymous aggregate data to understand community mental health trends
+
+### For Institutions
+
+- **🏫 Student Support**: Tools for universities to support student mental wellness
+- **🏥 Clinic Integration**: API endpoints for healthcare providers and mental health clinics
+- **📈 Analytics Dashboard**: Insights for NGOs and institutions to track program effectiveness
+- **🔗 Resource Sharing**: Platform for organizations to share mental health resources
+
+## Technology Stack
+
+- **Framework**: NestJS 11.0.1
+- **Runtime**: Node.js
+- **Language**: TypeScript
+- **Package Manager**: pnpm
+- **Testing**: Jest
+- **Linting**: ESLint + Prettier
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (version 18 or higher recommended)
+- pnpm package manager
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-$ pnpm install
+git clone <repository-url>
+cd e-kunde-api
 ```
 
-## Compile and run the project
+2. Install dependencies:
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm install
 ```
 
-## Run tests
+### Development
+
+Start the development server:
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm run start:dev
 ```
 
-## Deployment
+The API will be available at `http://localhost:3000`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Other Commands
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Build for production
+pnpm run build
+
+# Start in production mode
+pnpm run start:prod
+
+# Debug mode
+pnpm run start:debug
+
+# Format code
+pnpm run format
+
+# Lint code
+pnpm run lint
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Testing
 
-## Resources
+```bash
+# Run unit tests
+pnpm run test
 
-Check out a few resources that may come in handy when working with NestJS:
+# Run tests in watch mode
+pnpm run test:watch
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Run end-to-end tests
+pnpm run test:e2e
 
-## Support
+# Generate test coverage report
+pnpm run test:cov
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Debug tests
+pnpm run test:debug
+```
 
-## Stay in touch
+## Project Structure
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```
+src/
+├── app.controller.ts      # Main application controller
+├── app.controller.spec.ts # Controller unit tests
+├── app.module.ts          # Root application module
+├── app.service.ts         # Application service layer
+└── main.ts               # Application entry point
+test/
+├── app.e2e-spec.ts       # End-to-end tests
+└── jest-e2e.json         # E2E test configuration
+```
 
-## License
+## API Documentation
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Once the server is running, API documentation will be available at:
+
+- Development: `http://localhost:3000/api` (if Swagger is configured)
+
+## Environment Configuration
+
+Create a `.env` file in the root directory for environment-specific configurations:
+
+```env
+# Application
+NODE_ENV=development
+PORT=3000
+
+# Add other environment variables as needed
+```
+
+## Contributing
+
+We welcome contributions that align with our mission of creating a compassionate digital space. Please ensure that any contributions:
+
+1. **Follow our values**: Prioritize user safety, privacy, and well-being
+2. **Maintain code quality**: Follow the established linting and testing standards
+3. **Include tests**: Add appropriate unit and integration tests
+4. **Document changes**: Update relevant documentation
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and add tests
+4. Run the test suite: `pnpm run test`
+5. Commit your changes: `git commit -m 'Add some amazing feature'`
+6. Push to the branch: `git push origin feature/amazing-feature`
+7. Open a Pull Request
+
+## 🌱 Impact Goals
+
+e-Kunde aims to address the critical mental health challenges in East Africa by:
+
+- **Breaking Stigma**: Creating culturally sensitive platforms where mental health discussions are normalized
+- **Increasing Access**: Providing digital-first solutions where traditional mental health services are limited
+- **Building Community**: Fostering peer support networks within educational and healthcare institutions
+- **Empowering Institutions**: Giving universities, clinics, and NGOs tools to better serve their communities
+- **Data-Driven Insights**: Helping organizations understand and respond to community mental health needs
+
+## 🔒 Privacy & Ethics
+
+Mental health data is deeply personal. e-Kunde is built with privacy-by-design principles:
+
+- **Anonymization Options**: Users can engage without revealing personal identifiers
+- **Data Sovereignty**: All data remains under user control with transparent usage policies
+- **Cultural Sensitivity**: AI models trained with East African cultural contexts and values
+- **Ethical AI**: Technology designed to augment human empathy, not replace human connection
+
+## 🤝 Community Guidelines
+
+e-Kunde thrives on mutual respect and cultural understanding:
+
+1. **Respect Cultural Diversity**: Honor the rich diversity of East African communities
+2. **Practice Empathy**: Approach all interactions with compassion and understanding
+3. **Maintain Confidentiality**: Respect the privacy and vulnerability of community members
+4. **Seek Help When Needed**: Know when to escalate to professional mental health support
+
+## 📞 Crisis Resources
+
+If you or someone you know is in immediate danger, please contact:
+
+- **Emergency Services**: Your local emergency number
+- **Mental Health Hotlines**: [To be populated with regional resources]
+- **Crisis Text Lines**: [To be populated with regional resources]
+
+## 🛡️ Security
+
+If you discover a security vulnerability, please send an email to **waka.florien45@gmail.com** instead of using the issue tracker. Security issues affecting user mental health data are treated with the highest priority.
+
+## 📚 Resources
+
+- [NestJS Documentation](https://docs.nestjs.com) - Learn more about the NestJS framework
+- [WHO Mental Health Resources](https://www.who.int/health-topics/mental-disorders) - Global mental health guidelines
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/) - TypeScript language reference
+- [Jest Testing Framework](https://jestjs.io/docs/getting-started) - Testing documentation
+
+## 📄 License
+
+This project is licensed under UNLICENSED - see the `package.json` file for details.
+
+## 💬 Contact & Support
+
+**Author**: Waka Florien  
+**Email**: waka.florien45@gmail.com
+
+For support, questions, or collaboration opportunities related to e-Kunde API, please reach out via email or create an issue in the repository.
+
+---
+
+_Building bridges between technology and compassion, one connection at a time._ 🌍💙

@@ -1,8 +1,8 @@
 {
   "name": "e-kunde-api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "A safe digital space to care, connect, and grow — powered by AI, guided by compassion. A new way to care for your mind and community. Mental health in East Africa faces unique challenges—from stigma to access. e-Kunde was born from a need for a space that understands. We're not just an app; we're a digital hearth for healing, connection, and growth, built on shared experiences and cultural understanding. We bridge technology with empathy, offering inclusive tools for students, clinics, universities, and NGOs. Our mission is to make mental wellness a tangible, daily practice for everyone.",
+  "author": "wakaflorien <waka.florien45@gmail.com>",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
