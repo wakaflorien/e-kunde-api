@@ -2,6 +2,7 @@ import { config } from 'dotenv';
 import { defineConfig } from 'prisma/config';
 
 // Load environment variables from .env file
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 config();
 
 export default defineConfig({
