@@ -49,9 +49,63 @@ We bridge technology with empathy, offering inclusive tools for students, clinic
 - **Framework**: NestJS 11.0.1
 - **Runtime**: Node.js
 - **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: Prisma 6.18.0
 - **Package Manager**: pnpm
 - **Testing**: Jest
 - **Linting**: ESLint + Prettier
+- **API Documentation**: Swagger/OpenAPI
+
+## Database Schema
+
+The e-Kunde API uses a comprehensive PostgreSQL database schema with 50+ models covering:
+
+- 👤 **User Management**: Multi-role authentication, profiles, and consent settings
+- 💚 **Mental Health Tracking**: Check-ins, journals, goals, habits with AI insights
+- 🏥 **Healthcare System**: Bookings, sessions, practitioner profiles, and clinic management
+- 👥 **Community & Social**: Communities, posts, comments, reactions
+- 📚 **Content Management**: Articles, podcasts, videos, and campaigns
+- 🎓 **Universities**: Student wellbeing and community support
+- 💝 **NGOs & Sponsorship**: Program management and impact tracking
+- 🛠️ **Admin & Moderation**: Content moderation, flagging, reporting, and audit logs
+
+### Database Documentation
+
+- **Schema Overview**: See `prisma/SCHEMA_DOCUMENTATION.md`
+- **Implementation Summary**: See `prisma/IMPLEMENTATION_SUMMARY.md`
+- **Quick Reference**: See `prisma/QUICK_REFERENCE.md`
+- **Prisma Schema**: See `prisma/schema.prisma`
+
+### Prisma Commands
+
+```bash
+# Generate Prisma Client
+pnpm run prisma:generate
+
+# Create and apply migrations
+pnpm run prisma:migrate
+
+# Create migration without applying
+pnpm run prisma:migrate:create
+
+# Deploy migrations to production
+pnpm run prisma:migrate:deploy
+
+# Check migration status
+pnpm run prisma:migrate:status
+
+# Reset database (⚠️ deletes all data)
+pnpm run prisma:migrate:reset
+
+# Open Prisma Studio (database GUI)
+pnpm run prisma:studio
+
+# Push schema changes without migrations
+pnpm run prisma:push
+
+# Run seed file
+pnpm run prisma:seed
+```
 
 ## Getting Started
 
@@ -73,6 +127,35 @@ cd e-kunde-api
 
 ```bash
 pnpm install
+```
+
+3. Set up environment variables:
+
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+Required environment variables:
+
+```env
+# Application
+PORT=4000
+
+# Database
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+```
+
+4. Set up the database:
+
+```bash
+# Run migrations
+pnpm run prisma:migrate
+
+# Generate Prisma Client
+pnpm run prisma:generate
 ```
 
 ### Development

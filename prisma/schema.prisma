@@ -14,3 +14,1112 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  PATIENT // End users
+  CLINIC_ADMIN
+  CLINIC_STAFF
+  PRACTITIONER
+  UNIVERSITY_ADMIN
+  UNIVERSITY_COUNSELOR
+  STUDENT_LEAD
+  NGO_ADMIN
+  NGO_STAFF
+  DONOR
+  PLATFORM_ADMIN
+  MODERATOR
+  ANALYST
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+  PENDING_VERIFICATION
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+  TRIAL
+  SPONSORED
+}
+
+enum AuthMethod {
+  EMAIL
+  PHONE
+  OTP
+}
+
+enum ContentType {
+  ARTICLE
+  PODCAST
+  VIDEO
+  JOURNAL
+  POST
+}
+
+enum ContentVisibility {
+  PRIVATE
+  ANONYMOUS
+  PUBLIC
+}
+
+enum ContentStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  FLAGGED
+}
+
+enum CommunityType {
+  PUBLIC
+  PRIVATE
+  UNIVERSITY
+  CLINIC
+  NGO
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELED
+  NO_SHOW
+}
+
+enum SessionType {
+  IN_PERSON
+  VIDEO
+  AUDIO
+  PHONE
+}
+
+enum AppointmentSource {
+  WEB
+  HOTLINE
+  SMS
+  WALK_IN
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+enum HabitType {
+  BUILD
+  QUIT
+}
+
+enum ReminderType {
+  JOURNALING
+  MEDICATION
+  SELF_CARE
+  APPOINTMENT
+  FOLLOW_UP
+  TASK
+}
+
+enum CampaignType {
+  STORYTELLING
+  JOURNALING
+  KINDNESS
+  WELLNESS
+  EDUCATIONAL
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  SUPPORT
+  INSPIRE
+}
+
+enum NotificationType {
+  CAMPAIGN
+  COMMUNITY
+  APPOINTMENT
+  REMINDER
+  SYSTEM
+  MESSAGE
+}
+
+enum ReportType {
+  PATIENT
+  CLINIC
+  ENGAGEMENT
+  IMPACT
+  MONTHLY
+}
+
+enum FlagReason {
+  HARMFUL_CONTENT
+  SPAM
+  INAPPROPRIATE
+  VIOLATION
+  OTHER
+}
+
+// ============================================
+// CORE USER & AUTH
+// ============================================
+
+model User {
+  id               String           @id @default(uuid())
+  email            String?          @unique
+  phone            String?          @unique
+  passwordHash     String?
+  role             UserRole         @default(PATIENT)
+  status           AccountStatus    @default(ACTIVE)
+  subscriptionTier SubscriptionTier @default(FREE)
+  emailVerified    Boolean          @default(false)
+  phoneVerified    Boolean          @default(false)
+  lastLoginAt      DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Profile relationships
+  profile         Profile?
+  consentSettings ConsentSettings?
+
+  // Patient-specific
+  checkIns   CheckIn[]
+  journals   Journal[]
+  goals      Goal[]
+  habits     Habit[]
+  reminders  Reminder[]
+  bookings   Booking[]
+  reviews    Review[]
+  aiInsights AIInsight[]
+  streaks    Streak[]
+  badges     Badge[]
+  donations  Donation[]
+
+  // Practitioner-specific
+  practitionerProfile PractitionerProfile?
+  sessions            Session[]
+  sessionNotes        SessionNote[]
+
+  // Clinic-specific
+  clinicProfile    ClinicProfile?
+  clinicStaffRoles ClinicStaffRole[]
+
+  // University-specific
+  universityProfile UniversityProfile?
+
+  // NGO-specific
+  ngoProfile   NGOProfile?
+  sponsorships Sponsorship[]
+
+  // Social features
+  posts            Post[]
+  comments         Comment[]
+  reactions        Reaction[]
+  bookmarks        Bookmark[]
+  communityMembers CommunityMember[]
+  messages         Message[]
+  notifications    Notification[]
+
+  // Campaigns
+  campaignParticipants CampaignParticipant[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+model Profile {
+  id               String    @id @default(uuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName        String?
+  lastName         String?
+  displayName      String?
+  avatar           String?
+  bio              String?
+  dateOfBirth      DateTime?
+  gender           String?
+  location         String?
+  timezone         String?
+  language         String    @default("en")
+  emergencyContact String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@map("profiles")
+}
+
+model ConsentSettings {
+  id                            String   @id @default(uuid())
+  userId                        String   @unique
+  user                          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shareCheckInsWithPractitioner Boolean  @default(false)
+  shareJournalsWithPractitioner Boolean  @default(false)
+  shareAISummaries              Boolean  @default(false)
+  allowAnonymousPosts           Boolean  @default(true)
+  allowDataForResearch          Boolean  @default(false)
+  allowNotifications            Boolean  @default(true)
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+
+  @@map("consent_settings")
+}
+
+model OTPVerification {
+  id         String   @id @default(uuid())
+  identifier String // email or phone
+  otp        String
+  expiresAt  DateTime
+  verified   Boolean  @default(false)
+  attempts   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
+  @@index([expiresAt])
+  @@map("otp_verifications")
+}
+
+// ============================================
+// MENTAL HEALTH & DAILY ENGAGEMENT
+// ============================================
+
+model CheckIn {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mood         Int // 1-10 scale
+  emotions     String[] // Array of emotion tags
+  stressLevel  Int? // 1-10 scale
+  energyLevel  Int? // 1-10 scale
+  sleepQuality Int? // 1-10 scale
+  notes        String?
+  aiResponse   String?
+  aiInsightId  String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("check_ins")
+}
+
+model Journal {
+  id          String            @id @default(uuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String?
+  content     String
+  visibility  ContentVisibility @default(PRIVATE)
+  mood        Int? // 1-10 scale
+  tags        String[]
+  status      ContentStatus     @default(DRAFT)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  publishedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  reactions Reaction[]
+  comments  Comment[]
+  bookmarks Bookmark[]
+
+  @@index([userId])
+  @@index([visibility])
+  @@index([status])
+  @@index([createdAt])
+  @@map("journals")
+}
+
+model Goal {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  category    String? // e.g., "mental health", "fitness", "social"
+  targetDate  DateTime?
+  status      GoalStatus @default(ACTIVE)
+  progress    Int        @default(0) // 0-100 percentage
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  completedAt DateTime?
+
+  tasks Task[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("goals")
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  goalId      String
+  goal        Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  completed   Boolean   @default(false)
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([goalId])
+  @@map("tasks")
+}
+
+model Habit {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  type            HabitType
+  description     String?
+  targetFrequency String? // e.g., "daily", "3x per week"
+  currentStreak   Int       @default(0)
+  longestStreak   Int       @default(0)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  entries HabitEntry[]
+
+  @@index([userId])
+  @@map("habits")
+}
+
+model HabitEntry {
+  id        String   @id @default(uuid())
+  habitId   String
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  date      DateTime @default(now())
+  completed Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([habitId])
+  @@index([date])
+  @@map("habit_entries")
+}
+
+model Streak {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String // e.g., "check-in", "journal", "goal"
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastActiveAt  DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@map("streaks")
+}
+
+model Badge {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  icon        String?
+  category    String? // e.g., "consistency", "milestone", "community"
+  earnedAt    DateTime @default(now())
+
+  @@index([userId])
+  @@map("badges")
+}
+
+model AIInsight {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String // e.g., "daily_summary", "weekly_trend", "relapse_risk"
+  summary         String
+  insights        Json // Detailed insights as JSON
+  recommendations String[]
+  riskLevel       String? // "low", "medium", "high"
+  generatedAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([generatedAt])
+  @@map("ai_insights")
+}
+
+model Reminder {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        ReminderType
+  title       String
+  description String?
+  time        DateTime
+  recurring   Boolean      @default(false)
+  frequency   String? // e.g., "daily", "weekly"
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([time])
+  @@map("reminders")
+}
+
+// ============================================
+// HEALTHCARE & BOOKING
+// ============================================
+
+model ClinicProfile {
+  id               String    @id @default(uuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  description      String?
+  logo             String?
+  address          String
+  city             String
+  country          String
+  phone            String
+  email            String?
+  website          String?
+  workingHours     Json // Structured working hours
+  acceptsInsurance Boolean   @default(false)
+  insuranceTypes   String[]
+  specializations  String[]
+  isVerified       Boolean   @default(false)
+  rating           Float     @default(0)
+  reviewCount      Int       @default(0)
+  trialEndsAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  staffRoles  ClinicStaffRole[]
+  bookings    Booking[]
+  reviews     Review[]
+  communities Community[]
+  content     Content[]
+
+  @@index([city])
+  @@index([isVerified])
+  @@map("clinic_profiles")
+}
+
+model ClinicStaffRole {
+  id          String        @id @default(uuid())
+  clinicId    String
+  clinic      ClinicProfile @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String // e.g., "therapist", "receptionist", "supervisor"
+  permissions Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([clinicId, userId])
+  @@index([clinicId])
+  @@index([userId])
+  @@map("clinic_staff_roles")
+}
+
+model PractitionerProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title             String? // Dr., MSc., etc.
+  specialization    String[]
+  licenseNumber     String?
+  isVerified        Boolean  @default(false)
+  bio               String?
+  languages         String[]
+  workingHours      Json?
+  consultationFee   Decimal?
+  commissionRate    Decimal  @default(0)
+  rating            Float    @default(0)
+  reviewCount       Int      @default(0)
+  yearsOfExperience Int?
+  education         Json?
+  certifications    Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([isVerified])
+  @@index([specialization])
+  @@map("practitioner_profiles")
+}
+
+model Booking {
+  id                 String               @id @default(uuid())
+  patientId          String
+  patient            User                 @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  practitionerId     String?
+  practitioner       PractitionerProfile? @relation(fields: [practitionerId], references: [id])
+  clinicId           String?
+  clinic             ClinicProfile?       @relation(fields: [clinicId], references: [id])
+  sessionType        SessionType
+  appointmentSource  AppointmentSource    @default(WEB)
+  scheduledAt        DateTime
+  duration           Int // minutes
+  status             BookingStatus        @default(PENDING)
+  notes              String?
+  cancellationReason String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  session   Session?
+  reminders BookingReminder[]
+
+  @@index([patientId])
+  @@index([practitionerId])
+  @@index([clinicId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@map("bookings")
+}
+
+model BookingReminder {
+  id        String   @id @default(uuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sentAt    DateTime
+  type      String // "24h_before", "1h_before", "follow_up"
+  createdAt DateTime @default(now())
+
+  @@index([bookingId])
+  @@map("booking_reminders")
+}
+
+model Session {
+  id             String    @id @default(uuid())
+  bookingId      String    @unique
+  booking        Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  practitionerId String
+  practitioner   User      @relation(fields: [practitionerId], references: [id])
+  startedAt      DateTime?
+  endedAt        DateTime?
+  videoRoomUrl   String?
+  attendance     String? // "attended", "no_show"
+  createdAt      DateTime  @default(now())
+
+  notes SessionNote[]
+
+  @@index([practitionerId])
+  @@map("sessions")
+}
+
+model SessionNote {
+  id             String   @id @default(uuid())
+  sessionId      String
+  session        Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  practitionerId String
+  practitioner   User     @relation(fields: [practitionerId], references: [id])
+  notes          String
+  aiSummary      String?
+  tags           String[]
+  consentToShare Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([sessionId])
+  @@map("session_notes")
+}
+
+model Review {
+  id             String               @id @default(uuid())
+  userId         String
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  practitionerId String?
+  practitioner   PractitionerProfile? @relation(fields: [practitionerId], references: [id])
+  clinicId       String?
+  clinic         ClinicProfile?       @relation(fields: [clinicId], references: [id])
+  rating         Int // 1-5 stars
+  comment        String?
+  isAnonymous    Boolean              @default(false)
+  response       String? // Response from practitioner/clinic
+  respondedAt    DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@index([practitionerId])
+  @@index([clinicId])
+  @@map("reviews")
+}
+
+model MatchingTest {
+  id              String   @id @default(uuid())
+  userId          String
+  answers         Json // Structured answers
+  results         Json // Matching results
+  recommendations String[]
+  completedAt     DateTime @default(now())
+
+  @@index([userId])
+  @@map("matching_tests")
+}
+
+model Referral {
+  id                 String   @id @default(uuid())
+  fromPractitionerId String
+  toPractitionerId   String
+  patientId          String
+  reason             String
+  notes              String?
+  status             String // "pending", "accepted", "completed"
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([fromPractitionerId])
+  @@index([toPractitionerId])
+  @@index([patientId])
+  @@map("referrals")
+}
+
+// ============================================
+// COMMUNITY & SOCIAL
+// ============================================
+
+model Community {
+  id             String             @id @default(uuid())
+  name           String
+  description    String?
+  type           CommunityType
+  icon           String?
+  isPublic       Boolean            @default(true)
+  allowAnonymous Boolean            @default(false)
+  createdById    String?
+  clinicId       String?
+  clinic         ClinicProfile?     @relation(fields: [clinicId], references: [id])
+  universityId   String?
+  university     UniversityProfile? @relation(fields: [universityId], references: [id])
+  ngoId          String?
+  ngo            NGOProfile?        @relation(fields: [ngoId], references: [id])
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  members   CommunityMember[]
+  posts     Post[]
+  campaigns Campaign[]
+
+  @@index([type])
+  @@index([isPublic])
+  @@map("communities")
+}
+
+model CommunityMember {
+  id          String    @id @default(uuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String    @default("member") // "member", "moderator", "admin"
+  joinedAt    DateTime  @default(now())
+
+  @@unique([communityId, userId])
+  @@index([communityId])
+  @@index([userId])
+  @@map("community_members")
+}
+
+model Post {
+  id          String            @id @default(uuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  communityId String?
+  community   Community?        @relation(fields: [communityId], references: [id])
+  title       String?
+  content     String
+  visibility  ContentVisibility @default(PUBLIC)
+  isAnonymous Boolean           @default(false)
+  status      ContentStatus     @default(APPROVED)
+  mediaUrls   String[]
+  tags        String[]
+  flagged     Boolean           @default(false)
+  flagReason  String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  reactions Reaction[]
+  comments  Comment[]
+  bookmarks Bookmark[]
+
+  @@index([userId])
+  @@index([communityId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model Comment {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId      String?
+  post        Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  journalId   String?
+  journal     Journal? @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  contentId   String?
+  content     Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  parentId    String? // For nested comments
+  text        String
+  isAnonymous Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reactions Reaction[]
+
+  @@index([postId])
+  @@index([journalId])
+  @@index([contentId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+model Reaction {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      ReactionType
+  postId    String?
+  post      Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  journalId String?
+  journal   Journal?     @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment?     @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  contentId String?
+  content   Content?     @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, postId, type])
+  @@unique([userId, journalId, type])
+  @@unique([userId, commentId, type])
+  @@unique([userId, contentId, type])
+  @@index([postId])
+  @@index([journalId])
+  @@index([commentId])
+  @@index([contentId])
+  @@map("reactions")
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  journalId String?
+  journal   Journal? @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  contentId String?
+  content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@unique([userId, journalId])
+  @@unique([userId, contentId])
+  @@index([userId])
+  @@map("bookmarks")
+}
+
+model Message {
+  id             String    @id @default(uuid())
+  senderId       String
+  sender         User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId    String?
+  text           String
+  isGroupMessage Boolean   @default(false)
+  groupId        String?
+  readAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([groupId])
+  @@map("messages")
+}
+
+// ============================================
+// CONTENT & CAMPAIGNS
+// ============================================
+
+model Content {
+  id          String         @id @default(uuid())
+  title       String
+  description String?
+  type        ContentType
+  url         String?
+  body        String?
+  coverImage  String?
+  authorId    String?
+  clinicId    String?
+  clinic      ClinicProfile? @relation(fields: [clinicId], references: [id])
+  status      ContentStatus  @default(PENDING_REVIEW)
+  tags        String[]
+  category    String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  publishedAt DateTime?
+  isFeatured  Boolean        @default(false)
+  viewCount   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  reactions Reaction[]
+  comments  Comment[]
+  bookmarks Bookmark[]
+
+  @@index([type])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([isFeatured])
+  @@map("content")
+}
+
+model Campaign {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  type        CampaignType
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean      @default(true)
+  communityId String?
+  community   Community?   @relation(fields: [communityId], references: [id])
+  imageUrl    String?
+  goals       Json? // Campaign goals and metrics
+  createdById String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  participants CampaignParticipant[]
+
+  @@index([type])
+  @@index([isActive])
+  @@index([startDate])
+  @@map("campaigns")
+}
+
+model CampaignParticipant {
+  id          String   @id @default(uuid())
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  progress    Int      @default(0)
+  completed   Boolean  @default(false)
+  submissions Json? // User submissions
+  joinedAt    DateTime @default(now())
+
+  @@unique([campaignId, userId])
+  @@index([campaignId])
+  @@index([userId])
+  @@map("campaign_participants")
+}
+
+// ============================================
+// UNIVERSITIES & SCHOOLS
+// ============================================
+
+model UniversityProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  logo        String?
+  address     String
+  city        String
+  country     String
+  website     String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  communities Community[]
+
+  @@map("university_profiles")
+}
+
+// ============================================
+// NGOs & DONORS
+// ============================================
+
+model NGOProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  logo        String?
+  website     String?
+  focusAreas  String[]
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  communities  Community[]
+  sponsorships Sponsorship[]
+
+  @@map("ngo_profiles")
+}
+
+model Sponsorship {
+  id            String     @id @default(uuid())
+  ngoId         String
+  ngo           NGOProfile @relation(fields: [ngoId], references: [id], onDelete: Cascade)
+  sponsorId     String
+  sponsor       User       @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  beneficiaryId String? // User being sponsored
+  programName   String
+  description   String?
+  amount        Decimal?
+  modules       String[] // Specific modules sponsored
+  startDate     DateTime
+  endDate       DateTime?
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([ngoId])
+  @@index([sponsorId])
+  @@index([beneficiaryId])
+  @@map("sponsorships")
+}
+
+model Donation {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Decimal
+  currency    String   @default("USD")
+  purpose     String?
+  isRecurring Boolean  @default(false)
+  frequency   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("donations")
+}
+
+// ============================================
+// NOTIFICATIONS & SYSTEM
+// ============================================
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model Newsletter {
+  id             String    @id @default(uuid())
+  email          String
+  isActive       Boolean   @default(true)
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  @@index([email])
+  @@map("newsletters")
+}
+
+model ContactForm {
+  id        String    @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    String    @default("pending") // "pending", "replied", "closed"
+  repliedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([status])
+  @@map("contact_forms")
+}
+
+// ============================================
+// ADMIN & MODERATION
+// ============================================
+
+model Flag {
+  id          String     @id @default(uuid())
+  reporterId  String
+  targetType  String // "post", "comment", "journal", "user"
+  targetId    String
+  reason      FlagReason
+  description String?
+  status      String     @default("pending") // "pending", "reviewed", "resolved"
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime   @default(now())
+
+  @@index([status])
+  @@index([targetType, targetId])
+  @@map("flags")
+}
+
+model Report {
+  id           String     @id @default(uuid())
+  type         ReportType
+  title        String
+  description  String?
+  data         Json
+  generatedBy  String
+  generatedFor String? // User, Clinic, NGO ID
+  startDate    DateTime
+  endDate      DateTime
+  fileUrl      String?
+  createdAt    DateTime   @default(now())
+
+  @@index([type])
+  @@index([generatedFor])
+  @@map("reports")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  userId       String
+  action       String // "create", "update", "delete", "approve", "flag"
+  resourceType String // "user", "post", "content", etc.
+  resourceId   String
+  changes      Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model SystemSettings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedBy String
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("system_settings")
+}

@@ -7,7 +7,7 @@ import * as expressBasicAuth from 'express-basic-auth';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 4000;
 
   //  Always protect Swagger docs
   app.use(
@@ -60,8 +60,9 @@ async function bootstrap() {
   console.log('🚀 Application is running at:', appUrl);
   console.log('📘 Swagger docs are available at:', `${appUrl}/api`);
   console.log(
-    '🔐 Swagger credentials → username: saintsAdmin | password: saintdeals',
+    '🔐 Swagger credentials → username: admin | password: ekunde@123',
   );
+  console.log('✅ Base endpoint (Hello World) available at:', `${appUrl}/`);
 }
 
 bootstrap()
