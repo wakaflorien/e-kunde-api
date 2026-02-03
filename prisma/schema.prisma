@@ -494,6 +494,10 @@ model ClinicProfile {
   insuranceTypes   String[]
   specializations  String[]
   isVerified       Boolean   @default(false)
+  facilities       String[]
+  licenseNumber    String?
+  licenseExpiry    DateTime?
+  capacity         Int?
   rating           Float     @default(0)
   reviewCount      Int       @default(0)
   trialEndsAt      DateTime?
@@ -544,13 +548,16 @@ model PractitionerProfile {
   rating            Float    @default(0)
   reviewCount       Int      @default(0)
   yearsOfExperience Int?
-  education         Json?
-  certifications    Json?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  education            Json?
+  certifications       Json?
+  acceptingNewPatients Boolean  @default(true)
+  licenseExpiry        DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
-  bookings Booking[]
-  reviews  Review[]
+  bookings       Booking[]
+  reviews        Review[]
+  availabilities Availability[]
 
   @@index([isVerified])
   @@index([specialization])
@@ -596,6 +603,22 @@ model BookingReminder {
 
   @@index([bookingId])
   @@map("booking_reminders")
+}
+
+model Availability {
+  id             String              @id @default(uuid())
+  practitionerId String
+  practitioner   PractitionerProfile @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+  date           DateTime
+  startTime      String
+  endTime        String
+  slots          Json
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([practitionerId])
+  @@index([date])
+  @@map("availabilities")
 }
 
 model Session {
