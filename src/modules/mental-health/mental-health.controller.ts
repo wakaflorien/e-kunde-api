@@ -17,7 +17,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { MentalHealthService } from './mental-health.service';
-import { CreateCheckInDto, CreateJournalDto, CreateGoalDto } from './dto';
+import { CreateCheckInDto, CreateJournalDto, CreateGoalDto, CreateHabitDto, UpdateHabitDto, LogHabitDto, CreateReminderDto, UpdateReminderDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators';
 
@@ -168,5 +168,90 @@ export class MentalHealthController {
       userId,
       progress,
     );
+  }
+
+  // ============================================
+  // HABIT ENDPOINTS
+  // ============================================
+
+  @Post('habits')
+  @ApiOperation({ summary: 'Create a new habit' })
+  @ApiResponse({ status: 201, description: 'Habit created successfully' })
+  async createHabit(
+    @CurrentUser('id') userId: string,
+    @Body() dto: CreateHabitDto,
+  ) {
+    return this.mentalHealthService.createHabit(userId, dto);
+  }
+
+  @Get('habits')
+  @ApiOperation({ summary: 'Get user habits' })
+  @ApiResponse({ status: 200, description: 'Habits retrieved successfully' })
+  async getUserHabits(@CurrentUser('id') userId: string) {
+    return this.mentalHealthService.getUserHabits(userId);
+  }
+
+  @Patch('habits/:id')
+  @ApiOperation({ summary: 'Update a habit' })
+  @ApiResponse({ status: 200, description: 'Habit updated successfully' })
+  async updateHabit(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateHabitDto,
+  ) {
+    return this.mentalHealthService.updateHabit(id, userId, dto);
+  }
+
+  @Post('habits/:id/log')
+  @ApiOperation({ summary: 'Log a habit entry' })
+  @ApiResponse({ status: 201, description: 'Habit logged successfully' })
+  async logHabit(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: LogHabitDto,
+  ) {
+    return this.mentalHealthService.logHabit(id, userId, dto);
+  }
+
+  // ============================================
+  // REMINDER ENDPOINTS
+  // ============================================
+
+  @Post('reminders')
+  @ApiOperation({ summary: 'Create a new reminder' })
+  @ApiResponse({ status: 201, description: 'Reminder created successfully' })
+  async createReminder(
+    @CurrentUser('id') userId: string,
+    @Body() dto: CreateReminderDto,
+  ) {
+    return this.mentalHealthService.createReminder(userId, dto);
+  }
+
+  @Get('reminders')
+  @ApiOperation({ summary: 'Get user reminders' })
+  @ApiResponse({ status: 200, description: 'Reminders retrieved successfully' })
+  async getUserReminders(@CurrentUser('id') userId: string) {
+    return this.mentalHealthService.getUserReminders(userId);
+  }
+
+  @Patch('reminders/:id')
+  @ApiOperation({ summary: 'Update a reminder' })
+  @ApiResponse({ status: 200, description: 'Reminder updated successfully' })
+  async updateReminder(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateReminderDto,
+  ) {
+    return this.mentalHealthService.updateReminder(id, userId, dto);
+  }
+
+  @Delete('reminders/:id')
+  @ApiOperation({ summary: 'Delete a reminder' })
+  @ApiResponse({ status: 200, description: 'Reminder deleted successfully' })
+  async deleteReminder(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.mentalHealthService.deleteReminder(id, userId);
   }
 }
