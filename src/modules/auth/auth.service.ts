@@ -73,12 +73,7 @@ export class AuthService {
     });
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
-
-    return {
-      user: this.sanitizeUser(user),
-      ...tokens,
-    };
+    return this.generateTokens(user);
   }
 
   async login(dto: LoginDto) {
@@ -127,12 +122,7 @@ export class AuthService {
     });
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
-
-    return {
-      user: this.sanitizeUser(user),
-      ...tokens,
-    };
+    return this.generateTokens(user);
   }
 
   async requestOtp(dto: RequestOtpDto) {
@@ -200,6 +190,10 @@ export class AuthService {
       where: {
         OR: [{ email: dto.identifier }, { phone: dto.identifier }],
       },
+      include: {
+        profile: true,
+        consentSettings: true,
+      },
     });
 
     if (!user) {
@@ -242,23 +236,15 @@ export class AuthService {
     }
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
-
-    return {
-      user: this.sanitizeUser(user),
-      ...tokens,
-    };
+    return this.generateTokens(user);
   }
 
-  private async generateTokens(
-    userId: string,
-    email: string | null,
-    role: string,
-  ): Promise<JwtTokens> {
+  private async generateTokens(user: any): Promise<JwtTokens> {
     const payload = {
-      sub: userId,
-      email,
-      role,
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      user: this.sanitizeUser(user),
     };
 
     const accessToken = this.jwtService.sign(payload, {

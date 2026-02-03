@@ -30,6 +30,7 @@ enum UserRole {
   NGO_STAFF
   DONOR
   PLATFORM_ADMIN
+  SYSTEM_ADMIN
   MODERATOR
   ANALYST
 }
@@ -228,6 +229,10 @@ model User {
 
   // Campaigns
   campaignParticipants CampaignParticipant[]
+
+  // Insurance & Claims
+  insurancePolicies UserInsurance[]
+  claims            Claim[]
 
   @@index([email])
   @@index([phone])
@@ -584,6 +589,7 @@ model Booking {
 
   session   Session?
   reminders BookingReminder[]
+  claim     Claim?
 
   @@index([patientId])
   @@index([practitionerId])
@@ -637,6 +643,95 @@ model Session {
 
   @@index([practitionerId])
   @@map("sessions")
+}
+
+model InsuranceProvider {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  logo        String?
+  phone       String?
+  email       String?
+  website     String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  plans  InsurancePlan[]
+  claims Claim[]
+
+  @@map("insurance_providers")
+}
+
+model InsurancePlan {
+  id              String            @id @default(uuid())
+  providerId      String
+  provider        InsuranceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  coverageDetails Json? // Coverage limits, co-pay info, etc.
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  userInsurances UserInsurance[]
+  claims         Claim[]
+
+  @@index([providerId])
+  @@map("insurance_plans")
+}
+
+model UserInsurance {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId       String
+  plan         InsurancePlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  policyNumber String
+  expiryDate   DateTime?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([userId, planId])
+  @@index([userId])
+  @@index([planId])
+  @@map("user_insurances")
+}
+
+model Claim {
+  id              String            @id @default(uuid())
+  bookingId       String            @unique
+  booking         Booking           @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  patientId       String
+  patient         User              @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  planId          String
+  plan            InsurancePlan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  providerId      String
+  provider        InsuranceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  status          ClaimStatus       @default(PENDING)
+  amountClaimed   Float
+  amountApproved  Float             @default(0)
+  currency        String            @default("RWF")
+  rejectionReason String?
+  notes           String?
+  submittedAt     DateTime          @default(now())
+  processedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@map("claims")
+}
+
+enum ClaimStatus {
+  PENDING
+  REVIEWING
+  APPROVED
+  PARTIAL
+  REJECTED
+  CANCELED
 }
 
 model SessionNote {

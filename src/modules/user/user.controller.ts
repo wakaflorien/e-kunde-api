@@ -32,7 +32,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @Roles('CLINIC_ADMIN', 'UNIVERSITY_ADMIN', 'NGO_ADMIN')
+  @Roles('CLINIC_ADMIN', 'UNIVERSITY_ADMIN', 'NGO_ADMIN', 'SYSTEM_ADMIN')
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 409, description: 'User already exists' })
@@ -48,6 +48,7 @@ export class UserController {
     'UNIVERSITY_COUNSELOR',
     'NGO_ADMIN',
     'NGO_STAFF',
+    'SYSTEM_ADMIN',
   )
   @ApiOperation({ summary: 'Get all users with pagination' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
@@ -122,7 +123,7 @@ export class UserController {
   }
 
   @Patch(':id')
-  @Roles('CLINIC_ADMIN', 'UNIVERSITY_ADMIN', 'NGO_ADMIN')
+  @Roles('CLINIC_ADMIN', 'UNIVERSITY_ADMIN', 'NGO_ADMIN', 'SYSTEM_ADMIN')
   @ApiOperation({ summary: 'Update user by ID (Admin only)' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -131,7 +132,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @Roles('CLINIC_ADMIN', 'UNIVERSITY_ADMIN', 'NGO_ADMIN')
+  @Roles('CLINIC_ADMIN', 'UNIVERSITY_ADMIN', 'NGO_ADMIN', 'SYSTEM_ADMIN')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete user (Admin only)' })
   @ApiResponse({ status: 204, description: 'User deleted successfully' })

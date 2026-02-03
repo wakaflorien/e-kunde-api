@@ -10,6 +10,10 @@ import { MentalHealthModule } from './modules/mental-health/mental-health.module
 import { HealthcareModule } from './modules/healthcare/healthcare.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards';
+import { CommunityModule } from './modules/community/community.module';
+import { PostModule } from './modules/post/post.module';
+import { InsuranceModule } from './modules/insurance/insurance.module';
+import { ClaimModule } from './modules/claim/claim.module';
 import configuration from 'configuration/configuration';
 
 @Module({
@@ -23,6 +27,10 @@ import configuration from 'configuration/configuration';
     UserModule,
     MentalHealthModule,
     HealthcareModule,
+    CommunityModule,
+    PostModule,
+    InsuranceModule,
+    ClaimModule,
   ],
   controllers: [AppController],
   providers: [

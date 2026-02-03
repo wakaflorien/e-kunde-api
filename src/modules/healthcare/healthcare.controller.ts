@@ -81,7 +81,7 @@ export class HealthcareController {
 
   // Clinic Endpoints
   @Post('clinics/profile')
-  @Roles('CLINIC_ADMIN')
+  @Roles('CLINIC_ADMIN', 'SYSTEM_ADMIN')
   @ApiOperation({ summary: 'Create clinic profile' })
   createClinicProfile(
     @CurrentUser('id') userId: string,
@@ -91,7 +91,7 @@ export class HealthcareController {
   }
 
   @Patch('clinics/profile')
-  @Roles('CLINIC_ADMIN')
+  @Roles('CLINIC_ADMIN', 'SYSTEM_ADMIN')
   @ApiOperation({ summary: 'Update clinic profile' })
   updateClinicProfile(
     @CurrentUser('id') userId: string,
@@ -101,7 +101,7 @@ export class HealthcareController {
   }
 
   @Get('clinics/me')
-  @Roles('CLINIC_ADMIN')
+  @Roles('CLINIC_ADMIN', 'SYSTEM_ADMIN')
   @ApiOperation({ summary: 'Get my clinic profile' })
   getMyClinicProfile(@CurrentUser('id') userId: string) {
     return this.healthcareService.getClinicProfile(userId);
@@ -142,7 +142,8 @@ export class HealthcareController {
     @CurrentUser('role') role: string,
     @Body() dto: UpdateBookingStatusDto,
   ) {
-    return this.healthcareService.updateBookingStatus(id, userId, role, dto);
+    const isSpecialRole = role === 'CLINIC_ADMIN' || role === 'SYSTEM_ADMIN';
+    return this.healthcareService.updateBookingStatus(id, userId, isSpecialRole ? role : role, dto);
   }
 
   // Review Endpoints
