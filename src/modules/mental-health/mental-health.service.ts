@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateCheckInDto, CreateJournalDto, CreateGoalDto } from './dto';
+import { CreateCheckInDto, CreateJournalDto, CreateGoalDto, CreateHabitDto, UpdateHabitDto, LogHabitDto, CreateReminderDto, UpdateReminderDto } from './dto';
 import { PaginationParams } from '../../common/interfaces';
 
 @Injectable()
@@ -275,5 +275,122 @@ export class MentalHealthService {
         completedAt: progress >= 100 ? new Date() : null,
       },
     });
+  }
+
+  // ============================================
+  // HABIT METHODS
+  // ============================================
+
+  async createHabit(userId: string, dto: CreateHabitDto) {
+    return this.prisma.habit.create({
+      data: {
+        userId,
+        name: dto.name,
+        type: dto.type,
+        description: dto.description,
+        targetFrequency: dto.targetFrequency,
+      },
+    });
+  }
+
+  async getUserHabits(userId: string) {
+    return this.prisma.habit.findMany({
+      where: { userId, isActive: true },
+      include: {
+        entries: {
+          orderBy: { date: 'desc' },
+          take: 5, // Get last 5 entries for quick history
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async updateHabit(id: string, userId: string, dto: UpdateHabitDto) {
+    const habit = await this.prisma.habit.findFirst({ where: { id, userId } });
+    if (!habit) throw new NotFoundException('Habit not found');
+
+    return this.prisma.habit.update({
+      where: { id },
+      data: {
+        ...dto,
+      },
+    });
+  }
+
+  async logHabit(id: string, userId: string, dto: LogHabitDto) {
+    const habit = await this.prisma.habit.findFirst({ where: { id, userId } });
+    if (!habit) throw new NotFoundException('Habit not found');
+
+    // Create entry
+    const entry = await this.prisma.habitEntry.create({
+      data: {
+        habitId: id,
+        completed: dto.completed ?? true,
+        notes: dto.notes,
+        date: new Date(),
+      },
+    });
+
+    // Update streaks (simplified logic for now)
+    await this.prisma.habit.update({
+      where: { id },
+      data: {
+        currentStreak: habit.currentStreak + 1,
+        longestStreak: Math.max(habit.longestStreak, habit.currentStreak + 1),
+      },
+    });
+
+    return entry;
+  }
+
+  // ============================================
+  // REMINDER METHODS
+  // ============================================
+
+  async createReminder(userId: string, dto: CreateReminderDto) {
+    return this.prisma.reminder.create({
+      data: {
+        userId,
+        title: dto.title,
+        type: dto.type,
+        description: dto.description,
+        time: new Date(dto.time),
+        recurring: dto.recurring || false,
+        frequency: dto.frequency,
+      },
+    });
+  }
+
+  async getUserReminders(userId: string) {
+    return this.prisma.reminder.findMany({
+      where: { userId, isActive: true },
+      orderBy: { time: 'asc' },
+    });
+  }
+
+  async updateReminder(id: string, userId: string, dto: UpdateReminderDto) {
+    const reminder = await this.prisma.reminder.findFirst({
+      where: { id, userId },
+    });
+    if (!reminder) throw new NotFoundException('Reminder not found');
+
+    return this.prisma.reminder.update({
+      where: { id },
+      data: {
+        ...dto,
+        time: dto.time ? new Date(dto.time) : undefined,
+      },
+    });
+  }
+
+  async deleteReminder(id: string, userId: string) {
+    const reminder = await this.prisma.reminder.findFirst({
+      where: { id, userId },
+    });
+    if (!reminder) throw new NotFoundException('Reminder not found');
+
+    await this.prisma.reminder.delete({ where: { id } });
+    return { message: 'Reminder deleted successfully' };
   }
 }
