@@ -234,6 +234,10 @@ model User {
   insurancePolicies UserInsurance[]
   claims            Claim[]
 
+  // Referrals
+  sentReferrals     Referral[] @relation("ReferrerReferrals")
+  receivedReferrals Referral[] @relation("PatientReferrals")
+
   @@index([email])
   @@index([phone])
   @@index([role])
@@ -772,34 +776,6 @@ model Review {
   @@map("reviews")
 }
 
-model MatchingTest {
-  id              String   @id @default(uuid())
-  userId          String
-  answers         Json // Structured answers
-  results         Json // Matching results
-  recommendations String[]
-  completedAt     DateTime @default(now())
-
-  @@index([userId])
-  @@map("matching_tests")
-}
-
-model Referral {
-  id                 String   @id @default(uuid())
-  fromPractitionerId String
-  toPractitionerId   String
-  patientId          String
-  reason             String
-  notes              String?
-  status             String // "pending", "accepted", "completed"
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  @@index([fromPractitionerId])
-  @@index([toPractitionerId])
-  @@index([patientId])
-  @@map("referrals")
-}
 
 // ============================================
 // COMMUNITY & SOCIAL
@@ -1240,4 +1216,57 @@ model SystemSettings {
   createdAt DateTime @default(now())
 
   @@map("system_settings")
+}
+
+// ============================================
+// HEALTHCARE - REFERRALS
+// ============================================
+
+model Referral {
+  id              String   @id @default(uuid())
+  patientId       String
+  patient         User     @relation("PatientReferrals", fields: [patientId], references: [id])
+  referrerId      String
+  referrer        User     @relation("ReferrerReferrals", fields: [referrerId], references: [id])
+  targetId        String?  // Id of specific practitioner referred to (optional)
+  targetSpecialty String?  // Referring to a general specialty
+  reason          String
+  notes           String?
+  priority        String   @default("ROUTINE") // ROUTINE, URGENT, EMERGENCY
+  status          String   @default("PENDING") // PENDING, ACCEPTED, DECLINED, COMPLETED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([referrerId])
+  @@index([status])
+  @@map("referrals")
+}
+
+// ============================================
+// HEALTHCARE - MATCHING TEST
+// ============================================
+
+model MatchingTest {
+  id          String   @id @default(uuid())
+  userId      String?  // Can be anonymous initially
+  inputData   Json     // Storing answers: symptoms, preferences, language, etc.
+  status      String   @default("COMPLETED")
+  createdAt   DateTime @default(now())
+
+  results     MatchingResult[]
+
+  @@map("matching_tests")
+}
+
+model MatchingResult {
+  id             String       @id @default(uuid())
+  testId         String
+  test           MatchingTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  practitionerId String
+  score          Float        // Match percentage/score
+  createdAt      DateTime     @default(now())
+
+  @@index([testId])
+  @@map("matching_results")
 }
