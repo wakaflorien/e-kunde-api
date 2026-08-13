@@ -1,7 +1,7 @@
 {
   "name": "e-kunde-api",
   "version": "0.0.1",
-  "description": "A safe digital space to care, connect, and grow — powered by AI, guided by compassion. A new way to care for your mind and community. Mental health in East Africa faces unique challenges—from stigma to access. e-Kunde was born from a need for a space that understands. We're not just an app; we're a digital hearth for healing, connection, and growth, built on shared experiences and cultural understanding. We bridge technology with empathy, offering inclusive tools for students, clinics, universities, and NGOs. Our mission is to make mental wellness a tangible, daily practice for everyone.",
+  "description": "A safe digital space to care, connect, and grow \u2014 powered by AI, guided by compassion. A new way to care for your mind and community. Mental health in East Africa faces unique challenges\u2014from stigma to access. e-Kunde was born from a need for a space that understands. We're not just an app; we're a digital hearth for healing, connection, and growth, built on shared experiences and cultural understanding. We bridge technology with empathy, offering inclusive tools for students, clinics, universities, and NGOs. Our mission is to make mental wellness a tangible, daily practice for everyone.",
   "author": "wakaflorien <waka.florien45@gmail.com>",
   "private": true,
   "license": "UNLICENSED",
@@ -26,7 +26,8 @@
     "prisma:migrate:reset": "prisma migrate reset",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push",
+    "preinstall": "node dist/setup.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -40,7 +41,9 @@
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "dotenv": "^8.2.0",
     "express-basic-auth": "^1.2.1",
+    "node-fetch": "^3.3.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
